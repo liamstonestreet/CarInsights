@@ -10,7 +10,19 @@ import re
 # path = kagglehub.dataset_download("abdulmalik1518/cars-datasets-2025")
 # print("Path to dataset files:", path)
 
-def preprocess_data(df):
+def preprocess_india_cars(df):
+	# TODO
+	return df
+
+def preprocess_safety_ratings(df):
+	# TODO
+	return df
+
+def preprocess_recalls_2025(df):
+	# TODO
+	return df
+
+def preprocess_cars2025(df):
 	########### RENAMING COLUMNS ###########
 	df.rename(columns={"Company Names": "brand",
 	                   "Cars Names": "model",
@@ -94,19 +106,44 @@ def preprocess_data(df):
 	return df
 
 def main():
-	path = "data/cars_2025.csv"
-	df = pd.read_csv(path, encoding='cp1252')
-	df = preprocess_data(df)
+	path1 = "data/cars/cars_2025.csv"
+	path2 = "data/cars/cars_us_sales_2023.csv"
+	path3 = "data/cars/safety_ratings.csv"
+	path4 = "data/cars/recalls_2025.csv"
+	cars_2025_df = pd.read_csv(path1, encoding='cp1252')
+	cars_2025_df = preprocess_cars2025(cars_2025_df)
+
+	us_sales_df = pd.read_csv(path2)
+	us_sales_df = preprocess_india_cars(us_sales_df)
+
+	safety_ratings_df = pd.read_csv(path3, low_memory=False)
+	safety_ratings_df = preprocess_safety_ratings(safety_ratings_df)
+
+	recalls_2025_df = pd.read_csv(path4)
+	recalls_2025_df = preprocess_recalls_2025(recalls_2025_df)
+
+	# Debug output
+	print("Cars 2025 DataFrame Columns:")
+	print(len(safety_ratings_df.columns))
+	print(safety_ratings_df.columns)
+
+	print("US Sales DataFrame Columns:")
+	print(len(us_sales_df.columns))
+	print(us_sales_df.columns)
+
+	print("Recalls 2025 DataFrame Columns:")
+	print(len(recalls_2025_df.columns))
+	print(recalls_2025_df.columns)
 
 	# Quick sanity output
 	# print("Loaded dataframe — showing first 5 rows:")
 	# print(df.head())
-	print("\nDataFrame info:")
-	df.info()
-	print("\nUnique brands:", df['brand'].nunique()) # 37 unique brands
+	# print("\nDataFrame info:")
+	# cars_2025_df.info()
+	# print("\nUnique brands:", cars_2025_df['brand'].nunique()) # 37 unique brands
 
 	# Visualizations
-	brand_box_sidebyside(df)
+	# brand_box_sidebyside(cars_2025_df)
 
 def brand_box_sidebyside(df, brands=["Nissan", "Volkswagen", "Porsche", "Mazda", "Mitsubishi"]):
 	# brands = df['brand'].value_counts().index[:5]
