@@ -2,19 +2,7 @@
 
 Coded and completed by Liam Stonestreet, Aaron, and Shane Liu.
 
-## Who
+## File Structure
 
-Todo
-
-## What
-
-Todo
-
-## Why
-
-Todo
-
-## How
-
-Todo
+Data is in `data/` directory.
 
