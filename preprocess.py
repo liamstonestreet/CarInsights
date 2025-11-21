@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import re
+import os
 
 def preprocess_cars2025(df):
     # --- Rename columns for consistency ---
@@ -61,5 +62,28 @@ def preprocess_cars2025(df):
     df["fuel_type"] = df["fuel_type"].astype(str).str.strip().str.title()
     valid_types = ["Petrol", "Diesel", "Hybrid", "Electric"]
     df.loc[~df["fuel_type"].isin(valid_types), "fuel_type"] = "Unknown"
+
+    return df
+
+# datasource 4
+def preprocess_recall_data(recall_path):
+    # combine all csv files inside the folder path "recall_path"
+    df = pd.concat([pd.read_csv(os.path.join(recall_path, f)) 
+                    for f in os.listdir(recall_path) 
+                    if f.endswith('.csv')], 
+                    ignore_index=True
+                  )
+    # columns: "NHTSA ID","DOCUMENT NAME","MAKE","MODEL","MODEL YEAR","SUMMARY"
+    # convert columns to their respective types
+    df["NHTSA ID"] = df["NHTSA ID"].astype(str).str.strip()
+    df["DOCUMENT NAME"] = df["DOCUMENT NAME"].astype(str).str.strip()
+    df["MAKE"] = df["MAKE"].astype(str).str.strip()
+    df["MODEL"] = df["MODEL"].astype(str).str.strip()
+    df["MODEL YEAR"] = pd.to_numeric(df["MODEL YEAR"], errors="coerce")
+    df["SUMMARY"] = df["SUMMARY"].astype(str).str.strip()
+    # remove duplicates
+    df = df.drop_duplicates().copy()
+    # remove all rows where "MODEL YEAR" is 9999 or NaN
+    df = df[df["MODEL YEAR"].notna() & (df["MODEL YEAR"] != 9999)]
 
     return df
