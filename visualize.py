@@ -12,6 +12,20 @@ from PyQt6.QtWidgets import (
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 from wordcloud import WordCloud, STOPWORDS
+import spacy
+
+# Make sure you've run:
+#   pip install spacy
+#   python -m spacy download en_core_web_sm
+try:
+    nlp = spacy.load("en_core_web_sm")
+    # increase the size of the wordcloud
+    nlp.max_length = 70538817
+except OSError as e:
+    raise OSError(
+        "spaCy model 'en_core_web_sm' not found. "
+        "Install it with: python -m spacy download en_core_web_sm"
+    ) from e
 
 def performance_vs_price_bubbles(df):
     fig, axes = plt.subplots(1, 3, figsize=(18, 6))
@@ -100,6 +114,79 @@ def viz3(df):
 
     os.makedirs("output", exist_ok=True)
     output_path = os.path.join("output", "recall_wordcloud.png")
+    plt.tight_layout(pad=0)
+    plt.savefig(output_path, dpi=300)
+    plt.close()
+
+    print(f"Visualization 3 (wordcloud) saved to {output_path}")
+
+def viz3_2(df):
+    """
+    Visualization 3: Wordcloud of recall SUMMARY text, with spaCy noun phrases.
+
+    - Uses raw SUMMARY text.
+    - Extracts multi-word noun phrases with spaCy (e.g. "front passenger airbag").
+    - Adds those phrases (underscored) back into the text so WordCloud
+      treats them as single tokens.
+    """
+
+    summaries = df["SUMMARY"].dropna().astype(str)
+    if summaries.empty:
+        print("No SUMMARY text available for wordcloud.")
+        return
+
+    full_text = " ".join(summaries.tolist())
+
+    # Base stopwords + some recall-specific ones
+    stopwords = set(STOPWORDS)
+    extra_stops = {
+        "recall", "vehicle", "vehicles", "honda", "acura", "toyota", "ford",
+        "customer", "service", "team", "contacting", "urgent", "safety",
+        "please", "may", "could", "cause", "affected", "owners", "owner",
+        "dealers", "dealer", "free", "charge", "repair", "repairs",
+        "notice", "followup", "follow", "bulletin",
+    }
+    stopwords |= {w.lower() for w in extra_stops}
+
+    # ---------- spaCy noun-phrase extraction ----------
+    doc = nlp(full_text)
+
+    phrase_tokens = []
+    for chunk in doc.noun_chunks:
+        # Drop punctuation tokens
+        tokens = [t.text.lower() for t in chunk if not t.is_punct]
+
+        # Need at least 2 words for a "phrase"
+        if len(tokens) < 2:
+            continue
+
+        # Skip phrases that are all stopwords
+        if all(tok in stopwords for tok in tokens):
+            continue
+
+        # Underscore-join so WordCloud treats phrase as one token
+        phrase = "_".join(tokens)
+        phrase_tokens.append(phrase)
+
+    # Combine original text with noun-phrase tokens
+    combined_text = full_text + " " + " ".join(phrase_tokens)
+
+    # ---------- Generate wordcloud ----------
+    wc = WordCloud(
+        width=1600,
+        height=800,
+        background_color="white",
+        stopwords=stopwords,
+        collocations=False,  # we provide our own phrases
+    ).generate(combined_text)
+
+    plt.figure(figsize=(14, 7))
+    plt.imshow(wc, interpolation="bilinear")
+    plt.axis("off")
+    plt.title("Common Terms and Phrases in Recall Summaries")
+
+    os.makedirs("output", exist_ok=True)
+    output_path = os.path.join("output", "recall_wordcloud_2.png")
     plt.tight_layout(pad=0)
     plt.savefig(output_path, dpi=300)
     plt.close()

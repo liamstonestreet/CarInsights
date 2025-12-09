@@ -4,7 +4,7 @@ import pandas as pd
 from PyQt6.QtWidgets import QApplication
 
 from preprocess import preprocess_cars2025, preprocess_recall_data
-from visualize import performance_vs_price_bubbles, viz3, viz4
+from visualize import performance_vs_price_bubbles, viz3, viz3_2, viz4
 
 
 def main():
@@ -19,7 +19,8 @@ def main():
     recall_df = preprocess_recall_data(recall_path)
 
     # -------- Visualization 3 (placeholder for now) --------
-    viz3(recall_df)
+    # viz3(recall_df)
+    viz3_2(recall_df)
 
     # -------- Visualization 4: interactive PyQt6 window --------
     # app = QApplication(sys.argv)
