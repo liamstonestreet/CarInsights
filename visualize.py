@@ -1,13 +1,19 @@
 import matplotlib.pyplot as plt
 import os
+import mplcursors
+
 
 from PyQt6.QtWidgets import (
     QMainWindow,
     QWidget,
     QVBoxLayout,
     QComboBox,
-    QLabel,      # <- add this
+    QLabel,      
 )
+
+
+from PyQt6.QtWebEngineWidgets import QWebEngineView
+import plotly.graph_objects as go
 
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
@@ -20,7 +26,7 @@ import spacy
 try:
     nlp = spacy.load("en_core_web_sm")
     # increase the size of the wordcloud
-    nlp.max_length = 70538817
+    # nlp.max_length = 70538817
 except OSError as e:
     raise OSError(
         "spaCy model 'en_core_web_sm' not found. "
@@ -84,7 +90,7 @@ def viz3(df):
         print("No SUMMARY text available for wordcloud.")
         return
 
-    full_text = " ".join(summaries.tolist())
+    full_text = " ".join(summaries.tolist()).lower()
 
     # Base stopwords + some recall-specific ones to avoid boring words
     stopwords = set(STOPWORDS)
@@ -93,9 +99,14 @@ def viz3(df):
         "customer", "service", "team", "contacting", "urgent", "safety",
         "please", "may", "could", "cause", "affected", "owners", "owner",
         "dealers", "dealer", "free", "charge", "repair", "repairs",
-        "notice", "followup", "follow", "bulletin"
+        "notice", "followup", "follow", "bulletin", "Impreza", "Civic",
+        "Accord", "CRV", "Pilot", "Camry", "Corolla", "RAV4", "F150", "occupant",
+        "Dodge", "Chrysler", "Jeep", "Ram", "letter", "appointment", "Letter",
+        "Takata", "AMENDMENT", "previous", "event", "regarding", "equipped",
+        "model year", "gregory", "gunther", "year", "2x", "Due", "potentially",
+        "revised"
     }
-    stopwords |= extra_stops
+    stopwords |= {w.lower() for w in extra_stops} # or operator (union)
 
     # Generate wordcloud
     wc = WordCloud(
@@ -144,7 +155,10 @@ def viz3_2(df):
         "customer", "service", "team", "contacting", "urgent", "safety",
         "please", "may", "could", "cause", "affected", "owners", "owner",
         "dealers", "dealer", "free", "charge", "repair", "repairs",
-        "notice", "followup", "follow", "bulletin",
+        "notice", "followup", "follow", "bulletin", "Impreza", "Civic",
+        "Accord", "CRV", "Pilot", "Camry", "Corolla", "RAV4", "F150", "occupant",
+        "Dodge", "Chrysler", "Jeep", "Ram", "letter mailed", "appointment", "Letter",
+        "Takata", "AMENDMENT", "previous version", "event", "regarding",
     }
     stopwords |= {w.lower() for w in extra_stops}
 
@@ -194,7 +208,6 @@ def viz3_2(df):
     print(f"Visualization 3 (wordcloud) saved to {output_path}")
 
 
-
 # ---------- Viz 4: Interactive recall trends by MODEL YEAR + MAKE ----------
 
 class RecallTrendsWindow(QMainWindow):
@@ -235,6 +248,13 @@ class RecallTrendsWindow(QMainWindow):
         self.fig = Figure(figsize=(12, 6))
         self.canvas = FigureCanvas(self.fig)
         layout.addWidget(self.canvas)
+
+        # make dropdowns stick to the top
+        layout.setStretch(layout.indexOf(make_label), 0)
+        layout.setStretch(layout.indexOf(self.make_combo), 0)
+        layout.setStretch(layout.indexOf(model_label), 0)
+        layout.setStretch(layout.indexOf(self.model_combo), 0)
+        layout.setStretch(layout.indexOf(self.canvas), 1)
 
         # wire up signals
         self.make_combo.currentTextChanged.connect(self.on_make_changed)
@@ -298,10 +318,30 @@ class RecallTrendsWindow(QMainWindow):
         years = grouped_full.index.to_list()
         counts = grouped_full.values
 
+        # Plot (w/ tooltip!)
+        # ax.plot(years, counts, marker="o")
+        # ax.set_xlabel("Model Year")
+        # ax.set_ylabel("Number of distinct recalls")
+
         # Plot
-        ax.plot(years, counts, marker="o")
+        line, = ax.plot(years, counts, marker="o")
         ax.set_xlabel("Model Year")
         ax.set_ylabel("Number of distinct recalls")
+
+        # -------- Hover tooltips with mplcursors --------
+        # keep a reference on self so it doesn't get garbage-collected
+        self.cursor = mplcursors.cursor(line, hover=True)
+
+        @self.cursor.connect("add")
+        def on_add(sel, years=years, counts=counts):
+            i = sel.index
+            year = years[i]
+            count = counts[i]
+            sel.annotation.set(
+                text=f"Year: {year}\nRecalls: {count}",
+                fontsize=9,
+            )
+
 
         title_suffix = "" if model == "All models" else f" – {model}"
         ax.set_title(f"Recall Trends for {make}{title_suffix} (by Model Year)")
@@ -322,11 +362,10 @@ class RecallTrendsWindow(QMainWindow):
 
         # Y-axis integer-only ticks
         max_y = grouped_full.max()
-        ax.set_yticks(range(0, max_y + 1))
+        ax.set_yticks(range(0, max(max_y + 1, 5)))
 
         self.fig.tight_layout()
         self.canvas.draw()
-
 
 
 def viz4(df):
