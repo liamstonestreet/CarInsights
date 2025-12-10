@@ -32,17 +32,7 @@ Most car search tools only provide surface-level information such as price, mile
 
 ---
 
-## Visualization 3: Recall Summary Wordcloud
-Creates a wordcloud from the **SUMMARY** field in the NHTSA recall dataset to highlight the most frequently occurring terms across all safety recall notices.
-
-- **Input**: Free-text recall summaries  
-- **Processing**: Removes stopwords and common filler terms  
-- **Output**: `output/recall_wordcloud.png`  
-- **Purpose**: Reveals recurring themes such as airbags, fuel systems, fires, and steering issues  
-
----
-
-## Visualization 4: Interactive Recall Trends (Make + Model)
+## Visualization 3: Interactive Recall Trends (Make + Model)
 An interactive PyQt6 tool that visualizes recall frequency over time.
 
 - **Dropdown 1**: Select car **Make**  
@@ -51,5 +41,15 @@ An interactive PyQt6 tool that visualizes recall frequency over time.
 - **Y-axis**: Number of distinct recall campaigns  
 - **Behavior**: Missing years automatically filled with zero; y-axis uses whole numbers only  
 - **Purpose**: Allows users to compare how different brands and models trend in recall activity over the years  
+
+---
+
+## Visualization 4: Recall Summary Wordcloud
+Creates a wordcloud from the **SUMMARY** field in the NHTSA recall dataset to highlight the most frequently occurring terms across all safety recall notices.
+
+- **Input**: Free-text recall summaries  
+- **Processing**: Removes stopwords and common filler terms  
+- **Output**: `output/recall_wordcloud.png`  
+- **Purpose**: Reveals recurring themes such as airbags, fuel systems, fires, and steering issues  
 
 ---

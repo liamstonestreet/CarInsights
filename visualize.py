@@ -8,7 +8,7 @@ from PyQt6.QtWidgets import (
     QWidget,
     QVBoxLayout,
     QComboBox,
-    QLabel,      
+    QLabel,    
 )
 
 
@@ -72,143 +72,7 @@ def performance_vs_price_bubbles(df):
     plt.savefig(output_path, dpi=300)
     print(f"Visualization saved to {output_path}")
 
-
-# ---------- Viz 3 placeholder (wordcloud will go here later) ----------
-
-# uses datasource 4 (recall data)
-def viz3(df):
-    """
-    Visualization 3: Wordcloud of recall SUMMARY text.
-
-    Takes the preprocessed recall dataframe (with SUMMARY column),
-    builds a wordcloud, and saves it to output/recall_wordcloud.png.
-    """
-
-    # Combine all summaries into one big string
-    summaries = df["SUMMARY"].dropna().astype(str)
-    if summaries.empty:
-        print("No SUMMARY text available for wordcloud.")
-        return
-
-    full_text = " ".join(summaries.tolist()).lower()
-
-    # Base stopwords + some recall-specific ones to avoid boring words
-    stopwords = set(STOPWORDS)
-    extra_stops = {
-        "recall", "vehicle", "vehicles", "honda", "acura", "toyota", "ford",
-        "customer", "service", "team", "contacting", "urgent", "safety",
-        "please", "may", "could", "cause", "affected", "owners", "owner",
-        "dealers", "dealer", "free", "charge", "repair", "repairs",
-        "notice", "followup", "follow", "bulletin", "Impreza", "Civic",
-        "Accord", "CRV", "Pilot", "Camry", "Corolla", "RAV4", "F150", "occupant",
-        "Dodge", "Chrysler", "Jeep", "Ram", "letter", "appointment", "Letter",
-        "Takata", "AMENDMENT", "previous", "event", "regarding", "equipped",
-        "model year", "gregory", "gunther", "year", "2x", "Due", "potentially",
-        "revised"
-    }
-    stopwords |= {w.lower() for w in extra_stops} # or operator (union)
-
-    # Generate wordcloud
-    wc = WordCloud(
-        width=1600,
-        height=800,
-        background_color="white",
-        stopwords=stopwords,
-        collocations=True  # keep common two-word phrases
-    ).generate(full_text)
-
-    # Plot and save
-    plt.figure(figsize=(14, 7))
-    plt.imshow(wc, interpolation="bilinear")
-    plt.axis("off")
-    plt.title("Common Terms in Recall Summaries")
-
-    os.makedirs("output", exist_ok=True)
-    output_path = os.path.join("output", "recall_wordcloud.png")
-    plt.tight_layout(pad=0)
-    plt.savefig(output_path, dpi=300)
-    plt.close()
-
-    print(f"Visualization 3 (wordcloud) saved to {output_path}")
-
-def viz3_2(df):
-    """
-    Visualization 3: Wordcloud of recall SUMMARY text, with spaCy noun phrases.
-
-    - Uses raw SUMMARY text.
-    - Extracts multi-word noun phrases with spaCy (e.g. "front passenger airbag").
-    - Adds those phrases (underscored) back into the text so WordCloud
-      treats them as single tokens.
-    """
-
-    summaries = df["SUMMARY"].dropna().astype(str)
-    if summaries.empty:
-        print("No SUMMARY text available for wordcloud.")
-        return
-
-    full_text = " ".join(summaries.tolist())
-
-    # Base stopwords + some recall-specific ones
-    stopwords = set(STOPWORDS)
-    extra_stops = {
-        "recall", "vehicle", "vehicles", "honda", "acura", "toyota", "ford",
-        "customer", "service", "team", "contacting", "urgent", "safety",
-        "please", "may", "could", "cause", "affected", "owners", "owner",
-        "dealers", "dealer", "free", "charge", "repair", "repairs",
-        "notice", "followup", "follow", "bulletin", "Impreza", "Civic",
-        "Accord", "CRV", "Pilot", "Camry", "Corolla", "RAV4", "F150", "occupant",
-        "Dodge", "Chrysler", "Jeep", "Ram", "letter mailed", "appointment", "Letter",
-        "Takata", "AMENDMENT", "previous version", "event", "regarding",
-    }
-    stopwords |= {w.lower() for w in extra_stops}
-
-    # ---------- spaCy noun-phrase extraction ----------
-    doc = nlp(full_text)
-
-    phrase_tokens = []
-    for chunk in doc.noun_chunks:
-        # Drop punctuation tokens
-        tokens = [t.text.lower() for t in chunk if not t.is_punct]
-
-        # Need at least 2 words for a "phrase"
-        if len(tokens) < 2:
-            continue
-
-        # Skip phrases that are all stopwords
-        if all(tok in stopwords for tok in tokens):
-            continue
-
-        # Underscore-join so WordCloud treats phrase as one token
-        phrase = "_".join(tokens)
-        phrase_tokens.append(phrase)
-
-    # Combine original text with noun-phrase tokens
-    combined_text = full_text + " " + " ".join(phrase_tokens)
-
-    # ---------- Generate wordcloud ----------
-    wc = WordCloud(
-        width=1600,
-        height=800,
-        background_color="white",
-        stopwords=stopwords,
-        collocations=False,  # we provide our own phrases
-    ).generate(combined_text)
-
-    plt.figure(figsize=(14, 7))
-    plt.imshow(wc, interpolation="bilinear")
-    plt.axis("off")
-    plt.title("Common Terms and Phrases in Recall Summaries")
-
-    os.makedirs("output", exist_ok=True)
-    output_path = os.path.join("output", "recall_wordcloud_2.png")
-    plt.tight_layout(pad=0)
-    plt.savefig(output_path, dpi=300)
-    plt.close()
-
-    print(f"Visualization 3 (wordcloud) saved to {output_path}")
-
-
-# ---------- Viz 4: Interactive recall trends by MODEL YEAR + MAKE ----------
+# ---------- Viz 3: Interactive recall trends by MODEL YEAR + MAKE ----------
 
 class RecallTrendsWindow(QMainWindow):
     def __init__(self, df, default_make: str = "SUBARU"):
@@ -305,7 +169,7 @@ class RecallTrendsWindow(QMainWindow):
             self.canvas.draw()
             return
 
-        # Count distinct recalls per year
+        # Count distinct recall campaigns per year
         grouped = df_brand.groupby("MODEL YEAR")["NHTSA ID"].nunique()
 
         # Build full continuous year range
@@ -334,7 +198,7 @@ class RecallTrendsWindow(QMainWindow):
 
         @self.cursor.connect("add")
         def on_add(sel, years=years, counts=counts):
-            i = sel.index
+            i = int(sel.index)
             year = years[i]
             count = counts[i]
             sel.annotation.set(
@@ -367,11 +231,64 @@ class RecallTrendsWindow(QMainWindow):
         self.fig.tight_layout()
         self.canvas.draw()
 
-
-def viz4(df):
+def viz3(df):
     """
-    Entry point for Visualization 4.
+    Entry point for Visualization 3.
 
     Returns a RecallTrendsWindow that main.py can show.
     """
     return RecallTrendsWindow(df, default_make="SUBARU")
+
+
+# ---------- Viz 4 placeholder (wordcloud will go here later) ----------
+
+# uses datasource 4 (recall data)
+def viz4(df):
+    """
+    Visualization 4: Wordcloud of recall SUMMARY text.
+
+    Takes the preprocessed recall dataframe (with SUMMARY column),
+    builds a wordcloud, and saves it to output/recall_wordcloud.png.
+    """
+
+    # Combine all summaries into one big string
+    summaries = df["SUMMARY"].dropna().astype(str)
+    if summaries.empty:
+        print("No SUMMARY text available for wordcloud.")
+        return
+
+    full_text = " ".join(summaries.tolist())
+
+    # Base stopwords + some recall-specific ones to avoid boring words
+    stopwords = set(STOPWORDS)
+    extra_stops = {
+        "recall", "vehicle", "vehicles", "honda", "acura", "toyota", "ford",
+        "customer", "service", "team", "contacting", "urgent", "safety",
+        "please", "may", "could", "cause", "affected", "owners", "owner",
+        "dealers", "dealer", "free", "charge", "repair", "repairs",
+        "notice", "followup", "follow", "bulletin"
+    }
+    stopwords |= extra_stops
+
+    # Generate wordcloud
+    wc = WordCloud(
+        width=1600,
+        height=800,
+        background_color="white",
+        stopwords=stopwords,
+        collocations=True  # keep common two-word phrases
+    ).generate(full_text)
+
+    # Plot and save
+    plt.figure(figsize=(14, 7))
+    plt.imshow(wc, interpolation="bilinear")
+    plt.axis("off")
+    plt.title("Common Terms in Recall Summaries")
+
+    os.makedirs("output", exist_ok=True)
+    output_path = os.path.join("output", "recall_wordcloud.png")
+    plt.tight_layout(pad=0)
+    plt.savefig(output_path, dpi=300)
+    plt.close()
+
+    print(f"Visualization 4 (wordcloud) saved to {output_path}")
