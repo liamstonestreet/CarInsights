@@ -89,7 +89,7 @@ def build_figure(make: str, model: str):
     return fig
 
 
-# ---------- Dash app ----------
+# ---------- Dash app (GPT helped me make the html layout) ----------
 
 app = Dash(__name__)
 
@@ -152,7 +152,6 @@ def update_model_options(selected_make):
         {"label": m, "value": m} for m in models
     ]
     return options, "ALL_MODELS"
-
 
 @app.callback(
     Output("recall-graph", "figure"),
