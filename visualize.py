@@ -6,7 +6,7 @@ from PyQt6.QtWidgets import (
     QWidget,
     QVBoxLayout,
     QComboBox,
-    QLabel,      # <- add this
+    QLabel,    
 )
 
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas
@@ -52,63 +52,7 @@ def performance_vs_price_bubbles(df):
     plt.savefig(output_path, dpi=300)
     print(f"Visualization saved to {output_path}")
 
-
-# ---------- Viz 3 placeholder (wordcloud will go here later) ----------
-
-# uses datasource 4 (recall data)
-def viz3(df):
-    """
-    Visualization 3: Wordcloud of recall SUMMARY text.
-
-    Takes the preprocessed recall dataframe (with SUMMARY column),
-    builds a wordcloud, and saves it to output/recall_wordcloud.png.
-    """
-
-    # Combine all summaries into one big string
-    summaries = df["SUMMARY"].dropna().astype(str)
-    if summaries.empty:
-        print("No SUMMARY text available for wordcloud.")
-        return
-
-    full_text = " ".join(summaries.tolist())
-
-    # Base stopwords + some recall-specific ones to avoid boring words
-    stopwords = set(STOPWORDS)
-    extra_stops = {
-        "recall", "vehicle", "vehicles", "honda", "acura", "toyota", "ford",
-        "customer", "service", "team", "contacting", "urgent", "safety",
-        "please", "may", "could", "cause", "affected", "owners", "owner",
-        "dealers", "dealer", "free", "charge", "repair", "repairs",
-        "notice", "followup", "follow", "bulletin"
-    }
-    stopwords |= extra_stops
-
-    # Generate wordcloud
-    wc = WordCloud(
-        width=1600,
-        height=800,
-        background_color="white",
-        stopwords=stopwords,
-        collocations=True  # keep common two-word phrases
-    ).generate(full_text)
-
-    # Plot and save
-    plt.figure(figsize=(14, 7))
-    plt.imshow(wc, interpolation="bilinear")
-    plt.axis("off")
-    plt.title("Common Terms in Recall Summaries")
-
-    os.makedirs("output", exist_ok=True)
-    output_path = os.path.join("output", "recall_wordcloud.png")
-    plt.tight_layout(pad=0)
-    plt.savefig(output_path, dpi=300)
-    plt.close()
-
-    print(f"Visualization 3 (wordcloud) saved to {output_path}")
-
-
-
-# ---------- Viz 4: Interactive recall trends by MODEL YEAR + MAKE ----------
+# ---------- Viz 3: Interactive recall trends by MODEL YEAR + MAKE ----------
 
 class RecallTrendsWindow(QMainWindow):
     def __init__(self, df, default_make: str = "SUBARU"):
@@ -242,10 +186,64 @@ class RecallTrendsWindow(QMainWindow):
 
 
 
-def viz4(df):
+def viz3(df):
     """
     Entry point for Visualization 4.
 
     Returns a RecallTrendsWindow that main.py can show.
     """
     return RecallTrendsWindow(df, default_make="SUBARU")
+
+
+# ---------- Viz 4 placeholder (wordcloud will go here later) ----------
+
+# uses datasource 4 (recall data)
+def viz4(df):
+    """
+    Visualization 4: Wordcloud of recall SUMMARY text.
+
+    Takes the preprocessed recall dataframe (with SUMMARY column),
+    builds a wordcloud, and saves it to output/recall_wordcloud.png.
+    """
+
+    # Combine all summaries into one big string
+    summaries = df["SUMMARY"].dropna().astype(str)
+    if summaries.empty:
+        print("No SUMMARY text available for wordcloud.")
+        return
+
+    full_text = " ".join(summaries.tolist())
+
+    # Base stopwords + some recall-specific ones to avoid boring words
+    stopwords = set(STOPWORDS)
+    extra_stops = {
+        "recall", "vehicle", "vehicles", "honda", "acura", "toyota", "ford",
+        "customer", "service", "team", "contacting", "urgent", "safety",
+        "please", "may", "could", "cause", "affected", "owners", "owner",
+        "dealers", "dealer", "free", "charge", "repair", "repairs",
+        "notice", "followup", "follow", "bulletin"
+    }
+    stopwords |= extra_stops
+
+    # Generate wordcloud
+    wc = WordCloud(
+        width=1600,
+        height=800,
+        background_color="white",
+        stopwords=stopwords,
+        collocations=True  # keep common two-word phrases
+    ).generate(full_text)
+
+    # Plot and save
+    plt.figure(figsize=(14, 7))
+    plt.imshow(wc, interpolation="bilinear")
+    plt.axis("off")
+    plt.title("Common Terms in Recall Summaries")
+
+    os.makedirs("output", exist_ok=True)
+    output_path = os.path.join("output", "recall_wordcloud.png")
+    plt.tight_layout(pad=0)
+    plt.savefig(output_path, dpi=300)
+    plt.close()
+
+    print(f"Visualization 4 (wordcloud) saved to {output_path}")

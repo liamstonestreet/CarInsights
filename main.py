@@ -18,14 +18,15 @@ def main():
     recall_path = "data/recall"
     recall_df = preprocess_recall_data(recall_path)
 
-    # -------- Visualization 3 (placeholder for now) --------
-    viz3(recall_df)
-
-    # -------- Visualization 4: interactive PyQt6 window --------
+    # -------- Visualization 3: interactive PyQt6 window --------
     # app = QApplication(sys.argv)
     # window = viz4(recall_df)  # returns RecallTrendsWindow
     # window.show()
     # sys.exit(app.exec())
+    # viz3(recall_df)
+
+    # -------- Visualization 4: wordcloud --------
+    viz4(recall_df)
 
 
 if __name__ == "__main__":
