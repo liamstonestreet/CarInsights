@@ -12,7 +12,7 @@ from PyQt6.QtWidgets import (
 )
 
 
-from PyQt6.QtWebEngineWidgets import QWebEngineView
+# from PyQt6.QtWebEngineWidgets import QWebEngineView
 import plotly.graph_objects as go
 
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas
@@ -266,10 +266,10 @@ def viz4(df):
         "customer", "service", "team", "contacting", "urgent", "safety",
         "please", "may", "could", "cause", "affected", "owners", "owner",
         "dealers", "dealer", "free", "charge", "repair", "repairs",
-        "notice", "followup", "follow", "bulletin", "information", "additional",
-        "part", "parts", "system", "systems", "may", "will", "also", "one",
-        "two", "use", "used", "using", "within", "without", "including",
-        "ensure", "ensure", "check", "checks", "checking"
+        # "notice", "followup", "follow", "bulletin", "information", "additional",
+        # "part", "parts", "system", "systems", "may", "will", "also", "one",
+        # "two", "use", "used", "using", "within", "without", "including",
+        # "ensure", "ensure", "check", "checks", "checking"
     }
     stopwords |= extra_stops
 
@@ -289,8 +289,8 @@ def viz4(df):
     plt.title("Common Terms in Recall Summaries")
 
     os.makedirs("output", exist_ok=True)
-    # output_path = os.path.join("output", "recall_wordcloud.png")
-    output_path = os.path.join("output", "recall_wordcloud.svg")
+    output_path = os.path.join("output", "recall_wordcloud.png")
+    #output_path = os.path.join("output", "recall_wordcloud.svg")
     plt.tight_layout(pad=0)
     # plt.savefig(output_path, dpi=300)
     plt.savefig(output_path, dpi=600, format="png")
