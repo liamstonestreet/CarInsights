@@ -1,0 +1,13 @@
+h5py
+wheel
+typing-extensions
+pandas
+numpy
+matplotlib
+PyQt6
+wordcloud
+kagglehub
+plotly
+dash
+mplcursors
+spacy

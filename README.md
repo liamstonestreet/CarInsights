@@ -3,27 +3,28 @@
 Coded and completed by Liam Stonestreet, Aaron, and Shane Liu.
 
 ## File Structure
-
-Data is in `data/` directory.
-
-## Objective
-Most car search tools only provide surface-level information such as price, mileage, and basic specifications. This project integrates car specifications to create a **Performance vs. Price Explorer**, helping consumers visualize tradeoffs between affordability and performance across brands and models.
-
-## Data Source
-- **Cars Dataset 2025 (European Market)**  
-  Kaggle: [abdulmalik1518/cars-datasets-2025](https://www.kaggle.com/datasets/abdulmalik1518/cars-datasets-2025)  
-  Features: brand, model, engine, horsepower, top speed, acceleration (0–100 km/h), price (USD), fuel type, seating capacity, torque.
-
-## File Structure
-- `main.py` → orchestrates preprocessing + visualization  
 - `preprocess.py` → cleans and standardizes dataset  
-- `visualize.py` → contains plotting functions  
-- `download_data.py` → downloads Kaggle dataset  
-- `data/` → raw datasets  
-- `output/` → saved plots  
+- `data/` → raw CSV datasets  
+- `output/` → saved plots
+
+## HOW TO RUN
+1. Create a Conda (or virtual) environment with Python version 3.12.
+  - For conda: `conda create -n test439 python=3.12 pip`
+2. Run `pip install -r requirements.txt` to install required libraries.
+3. If you are getting weird pip library/dependency errors, run the following commands in a fresh conda environment with Python version 3.12:
+  - `pip install h5py typing-extensions wheel`
+4. Make sure you put all the CSV files in the zip folder we attached in our project package, inside `data/` directory.
+4. Now you can run visualizations 3-6 by simply running their corresponding files:
+  - `viz3.py`
+  - `viz4.py`
+  - `viz5.py`
+  - `viz5.1.py`
+  - `viz6_discarded.py`
+5. Visualizations 1-2 are on Tableau [at this link](https://public.tableau.com/app/profile/aaron.fernandes7527/viz/Cars_17653299483430/HorsepowerScatter).
 
 ## Visualization 1: Performance vs. Price Explorer
-- **Design**: Three bubble charts side-by-side  
+This visualization is on Tableau [at this link](https://public.tableau.com/app/profile/aaron.fernandes7527/viz/Cars_17653299483430/HorsepowerScatter) (the first three tabs). 
+- **Design**: Three bubble charts 
 - **X-axis**: Price (USD)  
 - **Y-axis**: Horsepower, Acceleration, Top Speed (one per chart)  
 - **Bubble size**: Seating capacity  
@@ -31,6 +32,10 @@ Most car search tools only provide surface-level information such as price, mile
 - **Tooltip details**: Model, company, torque, acceleration, top speed  
 
 ---
+
+## Visualization 2: Radar chart of Fuel-type vs Price, Torque, 0-100, Horsepower, Max Speed
+This visualization is on Tableau [at this link](https://public.tableau.com/app/profile/aaron.fernandes7527/viz/Cars_17653299483430/HorsepowerScatter) (the fourth tab).
+
 
 ## Visualization 3: Interactive Recall Trends (Make + Model)
 An interactive PyQt6 tool that visualizes recall frequency over time.
@@ -53,3 +58,4 @@ Creates a wordcloud from the **SUMMARY** field in the NHTSA recall dataset to hi
 - **Purpose**: Reveals recurring themes such as airbags, fuel systems, fires, and steering issues  
 
 ---
+
