@@ -4,6 +4,7 @@ Coded and completed by Liam Stonestreet, Aaron, and Shane Liu.
 
 ## File Structure
 - `preprocess.py` → cleans and standardizes dataset  
+- `tableau_preprocess.py` → cleans dataset used for Tableau visualizations (Global 2025 dataset)
 - `data/` → raw CSV datasets  
 - `output/` → saved plots
 
